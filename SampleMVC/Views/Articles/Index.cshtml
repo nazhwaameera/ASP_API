@@ -1,4 +1,5 @@
-﻿@model SampleMVC.ViewModels.ArticlesByCategoryViewModel
+﻿@using Newtonsoft.Json
+@model SampleMVC.ViewModels.ArticlesByCategoryViewModel
 
 <div class="row">
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
@@ -24,7 +25,19 @@
                     </div>
                 </form>
                 <br /><br />
-                <a asp-action="Create" class="btn btn-outline-primary btn-sm">Create New</a>
+                @if (ViewContext.HttpContext.Session.GetString("user") != null)
+                {
+                    var userDtoSerialize = ViewContext.HttpContext.Session.GetString("user");
+                    var userDto = JsonConvert.DeserializeObject<UserDTO>(userDtoSerialize);
+                    foreach (var role in userDto.Roles)
+                    {
+                        if (role.RoleName == "contributor")
+                        {
+                            <a asp-action="Create" class="btn btn-outline-primary btn-sm">Create New</a>
+                        }
+                    }
+                }
+               
                 <table class="table table-striped">
                     <thead>
                         <tr>
@@ -32,9 +45,21 @@
                             <th>Category Name</th>
                             <th>Title</th>
                             <th>Is Approved</th>
-                            <th>&nbsp;</th>
-                            <th>&nbsp;</th>
-                            <th>&nbsp;</th>
+                            @if (ViewContext.HttpContext.Session.GetString("user") != null)
+                            {
+                                var userDtoSerialize = ViewContext.HttpContext.Session.GetString("user");
+                                var userDto = JsonConvert.DeserializeObject<UserDTO>(userDtoSerialize);
+                                foreach (var role in userDto.Roles)
+                                {
+                                    if (role.RoleName == "contributor")
+                                    {
+                                        <th>&nbsp;</th>
+                                        <th>&nbsp;</th>
+                                        <th>&nbsp;</th>
+                                    }
+                                }
+                            }
+
                         </tr>
                     </thead>
                     <tbody>
@@ -46,8 +71,20 @@
                                 <td>@article.Title</td>
                                 <td>@article.IsApproved</td>
                                 <td><img src="~/pics/@article.Pic" width="60" /></td>
-                                <td><a asp-action="Edit" asp-route-id="@article.CategoryID" class="btn btn-warning btn-sm">edit</a></td>
-                                <td><a asp-action="Delete" asp-route-id="@article.CategoryID" class="btn btn-danger btn-sm">delete</a></td>
+                                @if (ViewContext.HttpContext.Session.GetString("user") != null)
+                                {
+                                    var userDtoSerialize = ViewContext.HttpContext.Session.GetString("user");
+                                    var userDto = JsonConvert.DeserializeObject<UserDTO>(userDtoSerialize);
+                                    foreach (var role in userDto.Roles)
+                                    {
+                                        if (role.RoleName == "contributor")
+                                        {
+                                            <td><a asp-action="Edit" asp-route-id="@article.CategoryID" class="btn btn-warning btn-sm">edit</a></td>
+                                            <td><a asp-action="Delete" asp-route-id="@article.CategoryID" class="btn btn-danger btn-sm">delete</a></td>
+                                        }
+                                    }
+                                }
+                               
                             </tr>
                         }
                     </tbody>
